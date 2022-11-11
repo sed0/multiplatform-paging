@@ -20,7 +20,8 @@ actual class Pager<K : Any, V : Any> actual constructor(
     private val clientScope: CoroutineScope,
     private val config: PagingConfig,
     private val initialKey: K,
-    private val getItems: suspend (K, Int) -> PagingResult<K, V>
+    private val getItems: suspend (K, Int) -> PagingResult<K, V>,
+    getItemKey: (V) -> K,
 ) {
 
     private val _pagingData = MutableStateFlow<PagingData<V>?>(null)
@@ -39,7 +40,8 @@ actual class Pager<K : Any, V : Any> actual constructor(
         loadNext()
     }
 
-    fun refresh() {
+    actual fun refresh() {
+        _pagingData.value = null
         currentPagingResult.value = null
         _hasNextPage.value = true
         loadNext()
